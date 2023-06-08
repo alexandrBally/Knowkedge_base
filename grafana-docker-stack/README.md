@@ -1,5 +1,7 @@
 Запуск мониторинга на основе Grafana, Prometheus
 
+видео урок: https://www.youtube.com/watch?v=X_g-eJqiiLo&t=606s
+
 1. Склонировать репозиторий
 2. выполнить команду, для создания docker stack
     - docker swarm init
