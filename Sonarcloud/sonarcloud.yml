@@ -1,0 +1,48 @@
+# Create a GitHub Secret
+# In your GitHub repository, go to Settings > Secrets > Actions and create a new secret with the following details:
+
+# In the Name field, enter 
+# SONAR_TOKEN
+ 
+# In the Value field, enter 
+# 464062f909449289cf2b97da22e954364fc5aeee
+name: Build
+on:
+    push:
+      branches:
+        - develop
+    workflow_dispatch:
+    
+jobs:
+    sonarcloud:
+    name: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled f
+        with:or a better relevancy of analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+    deploy_in_dev:
+      name: run pull
+      runs-on: ubuntu-latest
+      
+      steps: 
+            
+      - name: install ssh keys
+ 
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+ 
+      - name: connect and pull repo
+        run:  |
+         ssh bravo@18.116.3.154  "cd /home/bravo/BRAVO/BRAVO_FE && git pull origin develop"
+         ssh bravo@18.116.3.154  "cd /home/bravo/BRAVO/ && make start"
+

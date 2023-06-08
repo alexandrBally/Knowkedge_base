@@ -1,0 +1,75 @@
+version: '3.8'
+services:
+  backend:
+      build: ./BRAVO_BE
+      container_name: bravo-backend
+      restart: unless-stopped
+      tty: true
+      working_dir: /usr/app
+      ports:
+        - "5001:4000"
+      volumes:
+        - /app/node_modules
+        - ./backend/src/:/app/
+      depends_on:
+        - postgres
+        - redis 
+      networks:
+        - app-network
+      env_file:
+        - .env
+
+  frontend:
+      build: ./BRAVO_FE
+      container_name: bravo-frontend
+      restart: unless-stopped
+      tty: true
+      working_dir: /usr/app
+      ports:
+        - "5002:3000"
+      volumes:
+        - /app/node_modules
+        - ./frontend/src/:/app/
+      depends_on:
+        - backend
+      networks:
+        - app-network
+      env_file:
+        - .env
+  postgres:
+    image: postgres
+    container_name: bravo-postgres
+    restart: always
+    environment:
+      - POSTGRES_DB_HOST=postgres
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bravo_db
+      - POSTGRES_DB_LOGGING=false
+    volumes:
+      - ./data/pg_data/:/var/lib/postgresql/data/
+    ports:
+      - "5532:5432"
+    networks:
+      - app-network
+    env_file:
+      - .env
+
+  redis:
+    image: redis
+    container_name: bravo-redis
+    environment:
+      - REDIS_URL='redis://redis:6379'
+
+    ports: 
+    - "5379:6379"
+    restart: always
+    volumes:
+      - ./data/redis_data/:/usr/local/etc/redis/redis.conf
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

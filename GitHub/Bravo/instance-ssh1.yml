@@ -1,0 +1,20 @@
+name: deploy-CI
+on:
+  push:
+    branches: [ "dev" ]
+  workflow_dispatch:
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run command on remote server
+        uses: D3rHase/ssh-command-action@v0.2.2
+        with:
+          host: ${{secrets.SSH_HOST}}
+          user: ${{secrets.SSH_USER}}
+          private_key: ${{secrets.SSH_PRIVATE_KEY}}
+          command: |
+            cd /home/integrated_logistics/integrated_logistics/integrated_logistics_BE;
+            git pull origin dev;
+            cd /home/integrated_logistics/integrated_logistics/;
+            make reload_be_service;

@@ -1,0 +1,16 @@
+image: docker:latest
+
+stages:
+- build
+
+build_to_EC2:
+  stage: build
+  before_script:
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    - ssh-add <(echo "$SSH_PRIVATE" | tr -d '\r')
+    - ssh ubuntu@158.160.108.31 "cd /home/ubuntu/elef/PushHtml; git pull git@gitlab.com:Abale/PushHtml.git"
+    - ssh ubuntu@158.160.108.31 "cd /home/ubuntu/elef/PushHtml/; docker compose up -d"
