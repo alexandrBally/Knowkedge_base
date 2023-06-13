@@ -1,0 +1,59 @@
+image: node:latest
+
+variables:
+  AWS_ENDPOINT: "https://storage.yandexcloud.net"
+  AWS_ACCESS_KEY_ID: "YCAJEDrAwni1QnR9Muat7L1kp"
+  AWS_SECRET_ACCESS_KEY: "YCO3g3QVRpTYfKE6VCLzg9o7295NFQuLPwInPiuz"
+  AWS_DEFAULT_REGION: "ru-central1"
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - npm install
+  - apt-get update && apt-get install -y awscli
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - ./build
+
+deploy_in_branch1:
+  stage: build
+  dependencies:
+    - branch1
+  script:
+    - aws --endpoint-url=$AWS_ENDPOINT s3 rm s3://sphera-web--staging/ --recursive"
+    - aws --endpoint-url=$AWS_ENDPOINT s3 cp --recursive ./build/ s3://sphera-web--staging/
+  only:
+    - branch1
+  tags:
+    - dusion_dev_server
+
+deploy_in_branch2:
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - aws --endpoint-url=$AWS_ENDPOINT s3 rm s3://sphera-web--staging/  --recursive"
+    - aws --endpoint-url=$AWS_ENDPOINT s3 cp --recursive ./build/ s3://sphera-web--staging/ 
+  only:
+    - branch2
+  tags:
+    - dusion_dev_server
+
+deploy_in_branch3:
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - aws --endpoint-url=$AWS_ENDPOINT s3 rm s3://sphera-web--staging/  --recursive"
+    - aws --endpoint-url=$AWS_ENDPOINT s3 cp --recursive ./build/ s3://sphera-web--staging/ 
+  only:
+    - branch3
+  tags:
+    - dusion_dev_server
