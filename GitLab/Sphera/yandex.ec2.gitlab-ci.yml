@@ -1,5 +1,4 @@
 image: node:latest
-
 stages:
   - build
   - deploy
@@ -8,6 +7,11 @@ before_script:
   - mkdir -p ~/.ssh
   - eval $(ssh-agent -s)
   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+  - apt update
+  - apt-get install zip -y
+  - apt-get install unzip -y
+  
 build:
   stage: build
   script:
@@ -15,13 +19,26 @@ build:
     - npm run build
   artifacts:
     paths:
-      - ./build
+      - ./
+  only:
+      - dev
+  tags:
+      - fusion_dev_server
+
+
 deploy:
   stage: deploy
   script:
     - ssh-add <(echo "$PRIVATE_KEY")
-    - ssh sphera@158.160.46.141 [ -f ~/.ssh/sphera.pem ] || "echo "$PRIVATE_KEY" > ~/.ssh/spherpa.pem
-    - ssh sphera@158.160.46.141 "mkdir -p /path/to/build" #prescribe the path
-    - scp -r build/* sphera@158.160.46.141:/path/to/build #prescribe the path
-    - ssh sphera@158.160.46.141 "cd /path/to/build && pm2 start app.js --watch --ignore-watch="node_modules"
-    - rm -rf ./build  ./node_modules 
+    - ssh "$HOST_NAME"@"$SSH_HOST"  "[ -f ~/.ssh/spherpa.pem ] || "echo '$PRIVATE_KEY' > ~/.ssh/sphera.pem""
+
+    - zip -r sphera_project.zip .
+    - ssh "$HOST_NAME"@"$SSH_HOST" "mkdir -p /home/sphera/sphera"
+    - scp -r sphera_project.zip  ""$HOST_NAME"@"$SSH_HOST":/home/sphera"
+    - ssh "$HOST_NAME"@"$SSH_HOST" "unzip -o /home/sphera/sphera_project.zip  -d /home/sphera/sphera/"
+    - rm -rf /home/sphera/sphera_project.zip
+    - ssh "$HOST_NAME"@"$SSH_HOST"  "cd /home/ubuntu/test/build && pm2 start ecosystemconfig.js"
+  only:
+      - dev
+  tags:
+      - fusion_dev_server
