@@ -12,3 +12,4 @@ build
 --env 'HOST_NAME=ubuntu' \
 --env 'SSH_HOST=54.203.26.42' \
 deploy
+
