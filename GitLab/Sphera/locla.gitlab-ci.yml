@@ -1,0 +1,50 @@
+image: node:latest
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - source .env
+  - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
+  - mkdir -p ~/.ssh
+  - eval $(ssh-agent -s)
+  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+  - apt update
+  - apt-get install zip -y
+  - apt-get install unzip -y
+  
+build:
+  stage: build
+  script:
+
+    - npm i
+    - npm run build
+    - zip -r sphera_project.zip .
+    - ssh-add ~/.ssh/test-sphera_rsa
+    - scp -r sphera_project.zip  ""$HOST_NAME"@"$SSH_HOST":/home/ubuntu"
+  only:
+      - main
+  tags:
+      - local_runner
+
+
+deploy:
+  stage: deploy
+
+  script:
+    - ssh-add ~/.ssh/test-sphera_rsa
+    - ssh "$HOST_NAME"@"$SSH_HOST" "mkdir -p /home/ubuntu/TEST"
+    - ssh "$HOST_NAME"@"$SSH_HOST" "unzip -o /home/ubuntu/sphera_project.zip  -d /home/ubuntu/TEST/"
+    - ssh "$HOST_NAME"@"$SSH_HOST" "rm -rf /home/ubuntu/sphera_project.zip"
+    - ssh "$HOST_NAME"@"$SSH_HOST"  "cd /home/ubuntu/test/build && pm2 start app.js"
+  dependencies:
+    - build
+  only:
+      - main
+  tags:
+      - local_runner
+
+
+

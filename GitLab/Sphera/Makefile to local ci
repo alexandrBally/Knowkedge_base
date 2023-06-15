@@ -1,0 +1,14 @@
+start:
+	sudo gitlab-runner exec docker --docker-privileged --builds-dir /tmp/builds \
+--docker-volumes /home/alexelef/Desktop/New:/tmp/builds \
+--docker-volumes /home/alexelef/Desktop/key:/root/.ssh \
+--env 'HOST_NAME=ubuntu' \
+--env 'SSH_HOST=54.203.26.42' \
+build 
+
+	sudo gitlab-runner exec docker --docker-privileged --builds-dir /tmp/builds \
+--docker-volumes /home/alexelef/Desktop/New:/tmp/builds \
+--docker-volumes /home/alexelef/Desktop/key:/root/.ssh \
+--env 'HOST_NAME=ubuntu' \
+--env 'SSH_HOST=54.203.26.42' \
+deploy

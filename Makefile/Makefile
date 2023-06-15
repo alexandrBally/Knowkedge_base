@@ -1,0 +1,60 @@
+
+#Docker
+start:
+	echo "INSTALL ZIP"
+	sudo apt update
+	sudo apt-get install zip -y
+	sudo apt-get install unzip -y
+	sudo echo "ZIP INSTALL COMPLITE"
+
+	echo "BUILD =================="
+	npm i
+	npm run build
+
+	echo DEPLOY
+	
+#     image: node:latest
+# stages:
+#   - build
+#   - deploy
+# before_script:
+#   - "which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )"
+#   - mkdir -p ~/.ssh
+#   - eval $(ssh-agent -s)
+#   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+
+#   - apt updatefile:///home/alexelef/Desktop/Book-app/PushHtml
+
+#   - apt-get install zip -y
+#   - apt-get install unzip -y
+  
+# build:
+#   stage: build
+#   script:
+#     - npm i
+#     - npm run build
+#   artifacts:
+#     paths:
+#       - ./
+#   only:
+#       - dev
+#   tags:
+#       - fusion_dev_server
+
+
+# deploy:
+#   stage: deploy
+#   script:
+#     - ssh-add <(echo "$PRIVATE_KEY")
+#     - ssh "$HOST_NAME"@"$SSH_HOST"  "[ -f ~/.ssh/spherpa.pem ] || "echo '$PRIVATE_KEY' > ~/.ssh/sphera.pem""
+
+#     - zip -r sphera_project.zip .
+#     - ssh "$HOST_NAME"@"$SSH_HOST" "mkdir -p /home/sphera/sphera"
+#     - scp -r sphera_project.zip  ""$HOST_NAME"@"$SSH_HOST":/home/sphera"
+#     - ssh "$HOST_NAME"@"$SSH_HOST" "unzip -o /home/sphera/sphera_project.zip  -d /home/sphera/sphera/"
+#     - rm -rf /home/sphera/sphera_project.zip
+#     - ssh "$HOST_NAME"@"$SSH_HOST"  "cd /home/ubuntu/test/build && pm2 start ecosystemconfig.js"
+#   only:
+#       - dev
+#   tags:
+#       - fusion_dev_server
