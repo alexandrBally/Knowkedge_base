@@ -1,5 +1,8 @@
 image: node:latest
 
+concurrent:
+  global: 1
+
 stages:
   - build
   - deploy
