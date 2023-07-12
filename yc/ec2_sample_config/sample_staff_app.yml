@@ -1,0 +1,42 @@
+name: stuff-server
+service_account_id: ajesnvor7uil8rfgci61
+
+instance_template:
+  platform_id: standard-v3
+  resources_spec:
+    memory: 2G
+    cores: 2
+    core_fraction: 100
+  boot_disk_spec:
+    mode: READ_WRITE
+    disk_spec:
+      image_id: fd8etnr6krbm4llmjgtn
+      type_id: network-hdd
+      size: 50G
+  network_interface_specs:
+    - network_id: enpup1dsij0av2hg5spb
+      subnet_ids:
+        - b0crjq0mat7hq4s9132h
+      primary_v4_address_spec: { one_to_one_nat_spec: { ip_version: IPV4 } }
+  metadata:
+    user-data: |-
+      #cloud-config
+      write_files:
+        - path: /var/lib/cloud/scripts/per-boot/01-run-load-generator.sh
+          permissions: '0555'
+          content: |
+            #!/bin/bash
+            apt-get update
+            apt-get install -y curl
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            nvm install 16
+            npm install -g pm2
+      users:
+        - name: fusion
+          groups: sudo
+          shell: /bin/bash
+          sudo: ['ALL=(ALL) NOPASSWD:ALL']
+          ssh-authorized-keys:
+            - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCV4QUmVJFRrvB0O8nL2IwpXyiIeeHkt0OIaoQbxO4Z/z4cAEymzZxHcu3K23QtIVf6vHUqSU11e54hHwacwpuJm3jwvhsp0xVVKfR9UoPzV9pxUnPrKAZMOfmi4rS2Opp3jzKRaDUrIBhp3OIntsjwszl+Y5c5FlDHyXHo8o9OorMoDF68xJfE4QxszadLmXiiOmrjwqKDuMsyU1FVL5OA5pqHmPbvcuT/x4dfT05B0fknv5Pa2jHd/uX/FqLCl7THRyA/yUJb+RoNo2n7Tg2Rg/aDi/VwdJBTr0k3UhY0vNxJITvtBHfb4GiDKg8Rt4m2mbj9SYXlNBqnoGDX2N9czXGQ53Knnjua/8JgUnmIQhYeKAIjtW6k+UakNUu/Nc2FSUS8dUYJ9mmAE+ygk49QwE+AsDHBBOvTqYXQW/R3td+ClE/NLY+TTM1LxepcHLLwd8NNOCeKYRK15hlEdhJDuFCCo+U0ojOW3ZrpeM7LDDorWRdeSQcRjgWBOVQjqdE= aleksandrelefteriadi@MacBook-Pro-Aleksandr.local

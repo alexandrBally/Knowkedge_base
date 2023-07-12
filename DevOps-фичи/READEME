@@ -1,0 +1,2 @@
+# Передать и запустить файл через SSH тунель:
+    ssh user@remote_host 'bash -s' < install.sh

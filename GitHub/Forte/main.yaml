@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  deploy_app:
+    name: run pull
+    runs-on: ubuntu-latest
+    steps:
+      - name: install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: install ssh keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~/.ssh/known_hosts
+      - name: connect and pull repo
+        run: |
+          ssh forte@52.24.172.239 "cd /home/forte/forte/forte-backend && git pull origin main"
+          ssh forte@52.24.172.239 "cd /home/forte/forte && make docker_db_up"
+          ssh forte@52.24.172.239 "source ~/.nvm/nvm.sh && nvm use 16 && cd /home/forte/forte/forte-backend && npm install &&  pm2 start ./ecosystem.config.js && pm2 save"
